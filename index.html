@@ -2,33 +2,331 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Accounting App</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             font-family: -apple-system, system-ui;
-            padding: 20px;
+            padding: 16px;
+            background: #f2f2f7;
             max-width: 600px;
             margin: 0 auto;
         }
-        .form-group {
-            margin-bottom: 15px;
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        input, select, button {
+
+        h2 {
+            margin-bottom: 16px;
+            color: #1c1c1e;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #3a3a3c;
+        }
+
+        select, input, textarea {
             width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            margin-bottom: 8px;
+            -webkit-appearance: none;
+        }
+
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 8px 0;
+        }
+
+        .month-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             padding: 8px;
-            margin-top: 5px;
+            background: #f2f2f7;
+            border-radius: 8px;
+        }
+
+        .month-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin: 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .balance {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            color: #34c759;
+            margin: 16px 0;
+        }
+
+        .transaction {
+            padding: 12px;
+            border-bottom: 1px solid #d1d1d6;
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .income-amount {
+            color: #34c759;
+        }
+
+        .payment-amount {
+            color: #ff3b30;
+        }
+
+        .transaction-details {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Accounting App</h1>
-    <div class="form-group">
-        <select id="transactionType">
-            <option value="">Select Transaction Type</option>
-            <option value="income">Income</option>
-            <option value="payment">Payment</option>
-        </select>
+    <div class="card">
+        <h2>Add Transaction</h2>
+        <div class="form-group">
+            <select id="transactionType">
+                <option value="">Select Transaction Type</option>
+                <option value="income">Income</option>
+                <option value="payment">Payment</option>
+            </select>
+        </div>
+
+        <!-- Income Form -->
+        <div id="incomeForm" class="hidden">
+            <div class="form-group">
+                <input type="text" id="incomeType" placeholder="Type" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="incomeName" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="incomeUnit" placeholder="Unit" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="incomeAmount" placeholder="Amount (EGP)" required>
+            </div>
+            <div class="form-group">
+                <label>Select Months:</label>
+                <div class="months-grid">
+                    <label class="month-item"><input type="checkbox" name="month" value="Jan"> Jan</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Feb"> Feb</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Mar"> Mar</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Apr"> Apr</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="May"> May</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Jun"> Jun</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Jul"> Jul</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Aug"> Aug</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Sep"> Sep</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Oct"> Oct</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Nov"> Nov</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Dec"> Dec</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea id="incomeNotes" placeholder="Notes" rows="3"></textarea>
+            </div>
+            <button onclick="saveIncome()">Save Income</button>
+        </div>
+
+        <!-- Payment Form -->
+        <div id="paymentForm" class="hidden">
+            <div class="form-group">
+                <input type="text" id="paymentType" placeholder="Type" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="paymentAmount" placeholder="Amount (EGP)" required>
+            </div>
+            <div class="form-group">
+                <input type="date" id="paymentDate" required>
+            </div>
+            <button onclick="savePayment()">Save Payment</button>
+        </div>
     </div>
+
+    <div class="card">
+        <h2>Balance</h2>
+        <div id="balance" class="balance">EGP 0</div>
+    </div>
+
+    <div class="card">
+        <h2>Recent Transactions</h2>
+        <div id="transactions"></div>
+    </div>
+
+    <script>
+        // Show/hide forms based on selection
+        document.getElementById('transactionType').addEventListener('change', function() {
+            document.getElementById('incomeForm').classList.toggle('hidden', this.value !== 'income');
+            document.getElementById('paymentForm').classList.toggle('hidden', this.value !== 'payment');
+        });
+
+        function saveIncome() {
+            const type = document.getElementById('incomeType').value;
+            const name = document.getElementById('incomeName').value;
+            const unit = document.getElementById('incomeUnit').value;
+            const amount = document.getElementById('incomeAmount').value;
+            const notes = document.getElementById('incomeNotes').value;
+            const months = Array.from(document.querySelectorAll('input[name="month"]:checked'))
+                .map(cb => cb.value);
+
+            if (!type || !name || !unit || !amount || months.length === 0) {
+                alert('Please fill in all required fields and select at least one month');
+                return;
+            }
+
+            const income = {
+                type: 'income',
+                details: {
+                    type,
+                    name,
+                    unit,
+                    amount: parseFloat(amount),
+                    months,
+                    notes
+                },
+                date: new Date().toISOString()
+            };
+
+            saveTransaction(income);
+            resetIncomeForm();
+        }
+
+        function savePayment() {
+            const type = document.getElementById('paymentType').value;
+            const amount = document.getElementById('paymentAmount').value;
+            const date = document.getElementById('paymentDate').value;
+
+            if (!type || !amount || !date) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const payment = {
+                type: 'payment',
+                details: {
+                    type,
+                    amount: parseFloat(amount),
+                    date
+                },
+                date: new Date().toISOString()
+            };
+
+            saveTransaction(payment);
+            resetPaymentForm();
+        }
+
+        function saveTransaction(transaction) {
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            transactions.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateDisplay();
+        }
+
+        function resetIncomeForm() {
+            document.getElementById('incomeType').value = '';
+            document.getElementById('incomeName').value = '';
+            document.getElementById('incomeUnit').value = '';
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeNotes').value = '';
+            document.querySelectorAll('input[name="month"]').forEach(cb => cb.checked = false);
+            document.getElementById('transactionType').value = '';
+            document.getElementById('incomeForm').classList.add('hidden');
+        }
+
+        function resetPaymentForm() {
+            document.getElementById('paymentType').value = '';
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentDate').value = '';
+            document.getElementById('transactionType').value = '';
+            document.getElementById('paymentForm').classList.add('hidden');
+        }
+
+        function updateDisplay() {
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            
+            // Update balance
+            const balance = transactions.reduce((sum, t) => {
+                return sum + (t.type === 'income' ? t.details.amount : -t.details.amount);
+            }, 0);
+            document.getElementById('balance').textContent = `EGP ${balance.toFixed(2)}`;
+
+            // Update transactions list
+            const transactionsHTML = transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map(t => {
+                    const amount = t.details.amount.toFixed(2);
+                    const amountClass = t.type === 'income' ? 'income-amount' : 'payment-amount';
+                    const details = t.type === 'income'
+                        ? `${t.details.type} - ${t.details.name} (${t.details.months.join(', ')})`
+                        : `${t.details.type} - ${t.details.date}`;
+
+                    return `
+                        <div class="transaction">
+                            <div class="transaction-amount ${amountClass}">
+                                EGP ${amount}
+                            </div>
+                            <div class="transaction-details">
+                                ${details}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
+            document.getElementById('transactions').innerHTML = transactionsHTML;
+        }
+
+        // Initial display update
+        updateDisplay();
+    </script>
 </body>
 </html>
