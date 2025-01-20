@@ -168,7 +168,215 @@
     </style>
 </head>
 <body>
-    <!-- Rest of the HTML and JavaScript remains exactly the same as the previous version -->
-[Previous body content from line 156 to the end remains exactly the same]
+    <div class="card">
+        <h2>Add Transaction</h2>
+        <div class="form-group">
+            <select id="transactionType">
+                <option value="">Select Transaction Type</option>
+                <option value="income">Income</option>
+                <option value="payment">Payment</option>
+            </select>
+        </div>
+
+        <!-- Income Form -->
+        <div id="incomeForm" class="hidden">
+            <div class="form-group">
+                <input type="text" id="incomeType" placeholder="Type" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="incomeName" placeholder="Name" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="incomeUnit" placeholder="Unit" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="incomeAmount" placeholder="Amount (EGP)" required>
+            </div>
+            <div class="form-group">
+                <label>Select Months:</label>
+                <div class="months-grid">
+                    <label class="month-item"><input type="checkbox" name="month" value="Jan"> Jan</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Feb"> Feb</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Mar"> Mar</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Apr"> Apr</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="May"> May</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Jun"> Jun</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Jul"> Jul</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Aug"> Aug</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Sep"> Sep</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Oct"> Oct</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Nov"> Nov</label>
+                    <label class="month-item"><input type="checkbox" name="month" value="Dec"> Dec</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <textarea id="incomeNotes" placeholder="Notes" rows="3"></textarea>
+            </div>
+            <button onclick="saveIncome()">Save Income</button>
+        </div>
+
+        <!-- Payment Form -->
+        <div id="paymentForm" class="hidden">
+            <div class="form-group">
+                <input type="text" id="paymentType" placeholder="Type" required>
+            </div>
+            <div class="form-group">
+                <input type="number" id="paymentAmount" placeholder="Amount (EGP)" required>
+            </div>
+            <div class="form-group">
+                <input type="date" id="paymentDate" required>
+            </div>
+            <button onclick="savePayment()">Save Payment</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Balance</h2>
+        <div id="balance" class="balance">EGP 0</div>
+    </div>
+
+    <div class="card">
+        <h2>Recent Transactions</h2>
+        <div id="transactions"></div>
+    </div>
+
+    <script>
+        // Load saved transactions
+        function loadTransactions() {
+            return JSON.parse(localStorage.getItem('transactions') || '[]');
+        }
+
+        // Show/hide forms based on selection
+        document.getElementById('transactionType').addEventListener('change', function() {
+            document.getElementById('incomeForm').classList.toggle('hidden', this.value !== 'income');
+            document.getElementById('paymentForm').classList.toggle('hidden', this.value !== 'payment');
+        });
+
+        function saveIncome() {
+            const type = document.getElementById('incomeType').value;
+            const name = document.getElementById('incomeName').value;
+            const unit = document.getElementById('incomeUnit').value;
+            const amount = document.getElementById('incomeAmount').value;
+            const notes = document.getElementById('incomeNotes').value;
+            const months = Array.from(document.querySelectorAll('input[name="month"]:checked'))
+                .map(cb => cb.value);
+
+            if (!type || !name || !unit || !amount || months.length === 0) {
+                alert('Please fill in all required fields and select at least one month');
+                return;
+            }
+
+            const income = {
+                type: 'income',
+                details: {
+                    type,
+                    name,
+                    unit,
+                    amount: parseFloat(amount),
+                    months,
+                    notes
+                },
+                date: new Date().toISOString()
+            };
+
+            saveTransaction(income);
+            resetIncomeForm();
+        }
+
+        function savePayment() {
+            const type = document.getElementById('paymentType').value;
+            const amount = document.getElementById('paymentAmount').value;
+            const date = document.getElementById('paymentDate').value;
+
+            if (!type || !amount || !date) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const payment = {
+                type: 'payment',
+                details: {
+                    type,
+                    amount: parseFloat(amount),
+                    date
+                },
+                date: new Date().toISOString()
+            };
+
+            saveTransaction(payment);
+            resetPaymentForm();
+        }
+
+        function saveTransaction(transaction) {
+            const transactions = loadTransactions();
+            transactions.push(transaction);
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+            updateDisplay();
+        }
+
+        function resetIncomeForm() {
+            document.getElementById('incomeType').value = '';
+            document.getElementById('incomeName').value = '';
+            document.getElementById('incomeUnit').value = '';
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeNotes').value = '';
+            document.querySelectorAll('input[name="month"]').forEach(cb => cb.checked = false);
+            document.getElementById('transactionType').value = '';
+            document.getElementById('incomeForm').classList.add('hidden');
+        }
+
+        function resetPaymentForm() {
+            document.getElementById('paymentType').value = '';
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('paymentDate').value = '';
+            document.getElementById('transactionType').value = '';
+            document.getElementById('paymentForm').classList.add('hidden');
+        }
+
+        function updateDisplay() {
+            const transactions = loadTransactions();
+            
+            // Update balance
+            const balance = transactions.reduce((sum, t) => {
+                return sum + (t.type === 'income' ? t.details.amount : -t.details.amount);
+            }, 0);
+            document.getElementById('balance').textContent = `EGP ${balance.toFixed(2)}`;
+
+            // Update transactions list
+            if (transactions.length === 0) {
+                document.getElementById('transactions').innerHTML = '<div class="empty-state">No transactions yet</div>';
+                return;
+            }
+
+            const transactionsHTML = transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .map(t => {
+                    const amount = t.details.amount.toFixed(2);
+                    const amountClass = t.type === 'income' ? 'income-amount' : 'payment-amount';
+                    const details = t.type === 'income'
+                        ? `${t.details.type} - ${t.details.name} (${t.details.months.join(', ')})`
+                        : `${t.details.type} - ${t.details.date}`;
+
+                    return `
+                        <div class="transaction">
+                            <div class="transaction-amount ${amountClass}">
+                                EGP ${amount}
+                            </div>
+                            <div class="transaction-details">
+                                ${details}
+                            </div>
+                        </div>
+                    `;
+                })
+                .join('');
+
+            document.getElementById('transactions').innerHTML = transactionsHTML;
+        }
+
+        // Initialize display when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+        });
+    </script>
 </body>
 </html>
