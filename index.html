@@ -56,24 +56,32 @@
 
         .months-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
             margin: 8px 0;
         }
 
         .month-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px;
             background: #f2f2f7;
             border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
         }
 
         .month-item input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin: 0;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            border-radius: 6px;
+            border: 2px solid #007aff;
+        }
+
+        @media (min-width: 768px) {
+            .months-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
 
         button {
@@ -126,6 +134,12 @@
 
         .hidden {
             display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #8e8e93;
+            padding: 20px;
         }
     </style>
 </head>
@@ -203,6 +217,11 @@
     </div>
 
     <script>
+        // Load saved transactions
+        function loadTransactions() {
+            return JSON.parse(localStorage.getItem('transactions') || '[]');
+        }
+
         // Show/hide forms based on selection
         document.getElementById('transactionType').addEventListener('change', function() {
             document.getElementById('incomeForm').classList.toggle('hidden', this.value !== 'income');
@@ -265,7 +284,7 @@
         }
 
         function saveTransaction(transaction) {
-            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const transactions = loadTransactions();
             transactions.push(transaction);
             localStorage.setItem('transactions', JSON.stringify(transactions));
             updateDisplay();
@@ -291,7 +310,7 @@
         }
 
         function updateDisplay() {
-            const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            const transactions = loadTransactions();
             
             // Update balance
             const balance = transactions.reduce((sum, t) => {
@@ -300,6 +319,11 @@
             document.getElementById('balance').textContent = `EGP ${balance.toFixed(2)}`;
 
             // Update transactions list
+            if (transactions.length === 0) {
+                document.getElementById('transactions').innerHTML = '<div class="empty-state">No transactions yet</div>';
+                return;
+            }
+
             const transactionsHTML = transactions
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .map(t => {
@@ -325,8 +349,10 @@
             document.getElementById('transactions').innerHTML = transactionsHTML;
         }
 
-        // Initial display update
-        updateDisplay();
+        // Initialize display when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDisplay();
+        });
     </script>
 </body>
 </html>
