@@ -1,9 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    // ... (previous head content remains the same)
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Accounting App</title>
     <style>
-        // ... (previous styles remain the same)
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, system-ui;
+            padding: 16px;
+            background: #f2f2f7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 16px;
+            color: #1c1c1e;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #3a3a3c;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            margin-bottom: 8px;
+            -webkit-appearance: none;
+        }
+
+        .months-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 8px 0;
+        }
 
         .month-item {
             display: flex;
@@ -46,7 +102,73 @@
             background: #e1f0ff;
         }
 
-        // ... (rest of the styles remain the same)
+        @media (min-width: 768px) {
+            .months-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .balance {
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            color: #34c759;
+            margin: 16px 0;
+        }
+
+        .transaction {
+            padding: 12px;
+            border-bottom: 1px solid #d1d1d6;
+        }
+
+        .transaction:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .income-amount {
+            color: #34c759;
+        }
+
+        .payment-amount {
+            color: #ff3b30;
+        }
+
+        .transaction-details {
+            color: #8e8e93;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: #8e8e93;
+            padding: 20px;
+        }
     </style>
-    // ... (rest of the code remains the same)
+</head>
+<body>
+    <!-- Rest of the HTML and JavaScript remains exactly the same as the previous version -->
+[Previous body content from line 156 to the end remains exactly the same]
+</body>
 </html>
